@@ -304,12 +304,18 @@ int set_command_block_dword_write(char *addr, char *data ,uint8_t *block){
     block[2] = ((addr_val & 0x0000FF00)>>8);
     block[1] = ((addr_val & 0x00FF0000)>>16);
     block[0] = ((addr_val & 0xFF000000)>>24);
-    block[7] = ((data_val & 0x000000FF));
-    block[6] = ((data_val & 0x0000FF00)>>8);
-    block[5] = ((data_val & 0x00FF0000)>>16);
-    block[4] = ((data_val & 0xFF000000)>>24);
+    //block[7] = ((data_val & 0x000000FF));
+    //block[6] = ((data_val & 0x0000FF00)>>8);
+    //block[5] = ((data_val & 0x00FF0000)>>16);
+    //block[4] = ((data_val & 0xFF000000)>>24);
+    block[5] = ((data_val & 0x000000FF));
+    block[4] = ((data_val & 0x0000FF00)>>8);
+    
 
-    return 8;
+
+
+   // return 8;
+    return 6;
 }
 
 int set_command_block_flash_word_write(char *addr, char *data ,uint8_t *block){
@@ -337,7 +343,7 @@ int set_command_block_flash_dword_write(char *addr, char *data ,uint8_t *block){
     block[5] = ((data_val & 0x00FF0000)>>16);
     block[4] = ((data_val & 0xFF000000)>>24);
 
-    return 8;
+   	 return 8;
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -350,7 +356,6 @@ int create_addressing_block(char *addr_mode, char *addr_string, char *addr2_stri
         //case 3: return set_addressing_block_by_type(addr_string,addr_block);break; //INCOMPLETE
         default: return 0;break;
     }
-
 }
 
 int create_command_block(char *cmd_mode,char* addr, char * len, char* data, uint8_t *addr_block){
@@ -371,7 +376,6 @@ int create_command_block(char *cmd_mode,char* addr, char * len, char* data, uint
         default:return 0; break;
     }
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -406,9 +410,9 @@ void send_command(char * mycmd){
     char *p_addr1 = cmd_args[2];
 
     char *p_addr2 = NULL;
-    char *p_data_to_write       = NULL;
+    char *p_data_to_write        = NULL;
     char *p_offset_addr          = NULL;
-    char *p_data_len_to_read    = NULL;
+    char *p_data_len_to_read     = NULL;
 
     if(addr_mode == 2){
         p_addr2 = cmd_args[3];
@@ -440,11 +444,13 @@ void send_command(char * mycmd){
     var1 = create_addressing_block(p_addr_mode, p_addr1, p_addr2, addr_block);
     var2 = create_command_block(p_cmd_mode, p_offset_addr, p_data_len_to_read, p_data_to_write, cmd_block);
 
-
-
-
     uint8_t COMMAND_TO_SEND[64];
     uint8_t *COMMAND_TO_SEND_PTR = COMMAND_TO_SEND;
+
+
+/////TEST EXTRA BYTE
+    //*COMMAND_TO_SEND_PTR++ = 0x01;
+    //*COMMAND_TO_SEND_PTR++ = 0x23;
 
 
     *(COMMAND_TO_SEND_PTR++) = STX;
@@ -459,6 +465,7 @@ void send_command(char * mycmd){
             *(COMMAND_TO_SEND_PTR++) = '\0';
         }
     }
+
     for(i=0;i<var2;i++){
         *(COMMAND_TO_SEND_PTR++) = cmd_block[i];
         if(cmd_block[i] == STX){
@@ -578,7 +585,8 @@ int main(int argc, char *argv[]){
 
 
     //AN EXAMPLATO READ 32BIT BY PHYSICAL ADDRESS, THE OFFSET ADDRESS 0x20 (31) and length = 1)
-    char mycmd[64] = "0, 5, 00:00:0A:57:99:30 , 32 , 1";
+    //char mycmd[64] = "0, 5, 00:00:0A:57:99:30 , 32 , 1";
+    char mycmd[64] = "0, 6, 00:00:0A:57:99:30 , 32 , 4626 ";
     char buffer[256];
 
 
